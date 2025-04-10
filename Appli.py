@@ -145,6 +145,6 @@ if st.session_state.authenticated:
             except Exception as e:
                 st.error(f"Erreur lors de la prédiction : {str(e)}")
 else:
-    st.info("Veuillez vous connecter via le menu latéral
+    st.info("Veuillez vous connecter via le menu latéral pour accéder à l'application.")
 
 
