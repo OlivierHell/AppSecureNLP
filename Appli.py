@@ -7,6 +7,14 @@ from cryptography.fernet import Fernet
 import os
 
 
+import nltk
+
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt")
+
+
 # Initialisation de NLTK
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
