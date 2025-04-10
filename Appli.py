@@ -6,32 +6,26 @@ import nltk
 from cryptography.fernet import Fernet
 import os
 
-
-import nltk
-
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
-
-
-# Initialisation de NLTK
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
-
-# Fonction pour vérifier et télécharger les ressources NLTK nécessaires
+# ==============================
+# 📌 Vérification des ressources NLTK
+# ==============================
 def check_nltk_resources():
-    resources = ['tokenizers/punkt', 'corpora/stopwords', 'corpora/wordnet']
-    for resource in resources:
+    resources = {
+        "punkt": "tokenizers/punkt",
+        "stopwords": "corpora/stopwords",
+        "wordnet": "corpora/wordnet"
+    }
+    for key, path in resources.items():
         try:
-            nltk.data.find(resource)
+            nltk.data.find(path)
         except LookupError:
-            print(f"Téléchargement de {resource}...")
-            nltk.download(resource)
+            nltk.download(key, quiet=True)
 
+check_nltk_resources()
 
-# Personnalisation du style avec CSS pour un thème cybersecurite et dark style IA
+# ==============================
+# 🎨 Personnalisation CSS
+# ==============================
 st.markdown(
     """
     <style>
@@ -63,24 +57,34 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# ==============================
+# 📦 Chargement du modèle et vectoriseur
+# ==============================
+@st.cache_resource(show_spinner=False)
+def load_model():
+    try:
+        model = joblib.load("model_secure.pkl")
+        vectorizer = joblib.load("tfidf_vectorizer.pkl")
+        return model, vectorizer
+    except Exception as e:
+        st.error("Erreur de chargement des fichiers modèles.")
+        st.stop()
 
-# Chargement des composants
-model = joblib.load("model_secure.pkl")
-vectorizer = joblib.load("tfidf_vectorizer.pkl")
+model, vectorizer = load_model()
 
-# Définition des tokens et de la clé Fernet directement dans le code
+# ==============================
+# 🔐 Données d'authentification
+# ==============================
 USERS = {
     "data_scientist": "Olivier",
     "analyst": "Yvan"
 }
-
-# Clé Fernet directement incluse
 fernet_key = "yM3-e-98fkF8aL8VT5mDLttqxtAfa7zwI_gndx0kGP8="
-
-# Utilisation de Fernet pour le chiffrement
 fernet = Fernet(fernet_key.encode())
 
-
+# ==============================
+# 🧽 Nettoyage de texte
+# ==============================
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"[^a-zA-Z\s]", "", text)
@@ -88,17 +92,21 @@ def clean_text(text):
     tokens = [t for t in tokens if t not in nltk.corpus.stopwords.words("english")]
     return " ".join(tokens)
 
+# ==============================
+# 🧾 Logger
+# ==============================
 def log_access(role, action):
     with open("log_access.txt", "a") as f:
         f.write(f"[{datetime.now()}] {role.upper()} - {action}\n")
 
-# Initialisation de l'état d'authentification
+# ==============================
+# 🔑 Authentification via sidebar
+# ==============================
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "user_role" not in st.session_state:
     st.session_state.user_role = None
 
-# Authentification en sidebar
 with st.sidebar:
     st.header("Authentification")
     role = st.selectbox("Sélectionnez votre rôle", list(USERS.keys()))
@@ -113,28 +121,35 @@ with st.sidebar:
             st.error("Token invalide.")
             st.session_state.authenticated = False
 
-# Affichage principal si authentification réussie
+# ==============================
+# 🧠 Interface principale
+# ==============================
 if st.session_state.authenticated:
     st.markdown("<div class='title'>🔐 SecureNLP Interface</div>", unsafe_allow_html=True)
     st.subheader("Designed by Olivier Hell and Yvan Kappu")
-    
+
     commentaire = st.text_area("✏️ Entrez votre commentaire à analyser")
+    
     if st.button("Analyser"):
         if commentaire.strip() == "":
             st.warning("Le champ ne peut pas être vide.")
         else:
-            log_access(st.session_state.user_role, "Demande de prédiction")
-            cleaned = clean_text(commentaire)
-            X = vectorizer.transform([cleaned])
-            pred = model.predict(X)[0]
-            label = "NEGATIVE" if pred else "POSITIVE"
-            encrypted = fernet.encrypt(label.encode()).decode()
-            
-            if st.session_state.user_role == "analyst":
-                st.write("🔐 Résultat chiffré :")
-                st.code(encrypted)
-            else:
-                st.write(f"✅ Prédiction : **{label}**")
-                st.write("🔐 Résultat chiffré :", encrypted)
+            try:
+                log_access(st.session_state.user_role, "Demande de prédiction")
+                cleaned = clean_text(commentaire)
+                X = vectorizer.transform([cleaned])
+                pred = model.predict(X)[0]
+                label = "NEGATIVE" if pred else "POSITIVE"
+                encrypted = fernet.encrypt(label.encode()).decode()
+
+                if st.session_state.user_role == "analyst":
+                    st.write("🔐 Résultat chiffré :")
+                    st.code(encrypted)
+                else:
+                    st.write(f"✅ Prédiction : **{label}**")
+                    st.write("🔐 Résultat chiffré :", encrypted)
+            except Exception as e:
+                st.error("Erreur lors de la prédiction. Détails : " + str(e))
 else:
     st.info("Veuillez vous connecter via le menu latéral pour accéder à l'application.")
+
