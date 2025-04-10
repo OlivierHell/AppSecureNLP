@@ -1,0 +1,18 @@
+[2025-04-09 15:18:55.175854] DATA SCIENTIST loaded dataset
+[2025-04-09 15:19:12.446061] ANALYST requested prediction
+[2025-04-09 15:38:45.894607] DATA SCIENTIST loaded dataset
+[2025-04-09 16:41:37.803043] ANALYST - Connexion réussie
+[2025-04-09 20:24:59.157941] DATA SCIENTIST loaded dataset
+[2025-04-09 20:25:03.738099] ANALYST requested prediction
+[2025-04-09 20:55:08.792721] DATA_SCIENTIST - Connexion réussie
+[2025-04-09 21:03:40.743068] DATA_SCIENTIST - Connexion réussie
+[2025-04-09 21:03:48.813037] DATA_SCIENTIST - Demande de prédiction
+[2025-04-10 05:09:12.256415] DATA_SCIENTIST - Connexion réussie
+[2025-04-10 05:09:30.062839] DATA_SCIENTIST - Demande de prédiction
+[2025-04-10 09:10:23.767152] DATA_SCIENTIST - Connexion réussie
+[2025-04-10 09:10:36.492955] DATA_SCIENTIST - Demande de prédiction
+[2025-04-10 09:16:12.554252] DATA_SCIENTIST - Connexion réussie
+[2025-04-10 09:16:23.050365] DATA_SCIENTIST - Demande de prédiction
+[2025-04-10 09:18:53.658538] ANALYST - Connexion réussie
+[2025-04-10 09:19:59.729141] ANALYST - Connexion réussie
+[2025-04-10 09:20:19.788990] ANALYST - Demande de prédiction
